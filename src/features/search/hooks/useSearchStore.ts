@@ -1,4 +1,7 @@
 import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
+
+import { zustandStorage } from '@/shared/services/storage';
 
 interface SearchState {
   query: string;
@@ -10,23 +13,32 @@ interface SearchState {
 
 const MAX_HISTORY = 10;
 
-export const useSearchStore = create<SearchState>((set, get) => ({
-  query: '',
-  searchHistory: [],
+export const useSearchStore = create<SearchState>()(
+  persist(
+    (set, get) => ({
+      query: '',
+      searchHistory: [],
 
-  setQuery: (query: string) => set({ query }),
+      setQuery: (query: string) => set({ query }),
 
-  addToHistory: (query: string) => {
-    const trimmed = query.trim();
-    if (!trimmed) {
-      return;
-    }
+      addToHistory: (query: string) => {
+        const trimmed = query.trim();
+        if (!trimmed) {
+          return;
+        }
 
-    const current = get().searchHistory;
-    const filtered = current.filter((item) => item !== trimmed);
-    const updated = [trimmed, ...filtered].slice(0, MAX_HISTORY);
-    set({ searchHistory: updated });
-  },
+        const current = get().searchHistory;
+        const filtered = current.filter((item) => item !== trimmed);
+        const updated = [trimmed, ...filtered].slice(0, MAX_HISTORY);
+        set({ searchHistory: updated });
+      },
 
-  clearHistory: () => set({ searchHistory: [] }),
-}));
+      clearHistory: () => set({ searchHistory: [] }),
+    }),
+    {
+      name: 'search-store',
+      storage: createJSONStorage(() => zustandStorage),
+      partialize: (state) => ({ searchHistory: state.searchHistory }) as unknown as SearchState,
+    },
+  ),
+);

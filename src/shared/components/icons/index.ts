@@ -8,4 +8,5 @@ export { SearchIcon } from './SearchIcon';
 export { SettingsIcon } from './SettingsIcon';
 export { StarIcon } from './StarIcon';
 export { SunIcon } from './SunIcon';
+export { WifiOffIcon } from './WifiOffIcon';
 export type { IconProps } from './types';

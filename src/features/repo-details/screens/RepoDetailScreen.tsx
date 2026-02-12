@@ -13,6 +13,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AlertTriangleIcon } from '@/shared/components/icons';
+import { OfflineBanner } from '@/shared/components/ui/OfflineBanner';
 import { useColors } from '@/shared/hooks/useColors';
 import { borderRadius, spacing } from '@/shared/theme/spacing';
 
@@ -58,6 +59,7 @@ export const RepoDetailScreen: React.FC = () => {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <StatusBar barStyle={statusBarStyle} backgroundColor={colors.background} />
+      <OfflineBanner />
       <ScrollView
         contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.lg }]}
         showsVerticalScrollIndicator={false}

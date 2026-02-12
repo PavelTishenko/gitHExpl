@@ -59,7 +59,8 @@ export function useRepoDetailScreen() {
     ];
   }, [repo, colors]);
 
-  const statusBarStyle = mode === 'dark' ? 'light-content' : 'dark-content';
+  const statusBarStyle: 'light-content' | 'dark-content' =
+    mode === 'dark' ? 'light-content' : 'dark-content';
 
   const handleOpenInBrowser = useCallback(() => {
     if (repo?.html_url) {
