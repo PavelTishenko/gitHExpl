@@ -1,3 +1,23 @@
+**Main page in different themes**
+
+<img width="355" height="779" alt="Знімок екрана 2026-02-12 о 19 08 32" src="https://github.com/user-attachments/assets/b2ade6c2-4d7c-4685-ad95-225a35a66fa5" />
+<img width="358" height="773" alt="Знімок екрана 2026-02-12 о 19 08 41" src="https://github.com/user-attachments/assets/67bf2d53-6ded-4a2b-83c4-8fad7b1d3f92" />
+
+**Details page**
+
+<img width="362" height="778" alt="Знімок екрана 2026-02-12 о 19 08 52" src="https://github.com/user-attachments/assets/c4c69116-f267-47ff-9ca8-f9c85eae6728" />
+<img width="357" height="776" alt="Знімок екрана 2026-02-12 о 19 10 15" src="https://github.com/user-attachments/assets/4f72c7b4-6528-48f8-92c8-3a04c60fc6a6" />
+
+**Offline mode**
+
+<img width="357" height="774" alt="Знімок екрана 2026-02-12 о 18 52 59" src="https://github.com/user-attachments/assets/98496cab-6c9d-4222-baf5-977358380cd3" />
+<img width="362" height="773" alt="Знімок екрана 2026-02-12 о 18 53 05" src="https://github.com/user-attachments/assets/d291a5f6-6d60-4e6a-a429-4bafc550a5e9" />
+
+**Inf scroll**
+
+<img width="384" height="348" alt="Знімок екрана 2026-02-12 о 19 23 18" src="https://github.com/user-attachments/assets/fe494acf-cb3f-416d-a94d-1a6bbb02ccdf" />
+
+
 # gitHExpl
 
 A React Native mobile app for exploring and browsing GitHub repositories. Search repos by name, topic, or keyword, browse results with infinite scroll, and view detailed repository information -- all with a polished dark/light theme.
