@@ -17,6 +17,7 @@ import { OfflineBanner } from '@/shared/components/ui/OfflineBanner';
 import { useColors } from '@/shared/hooks/useColors';
 import { borderRadius, spacing } from '@/shared/theme/spacing';
 
+import { InfoRow } from '../components/InfoRow';
 import { OwnerCard } from '../components/OwnerCard';
 import { RepoHeader } from '../components/RepoHeader';
 import { StatsRow } from '../components/StatsRow';
@@ -97,39 +98,6 @@ export const RepoDetailScreen: React.FC = () => {
   );
 };
 
-interface InfoRowProps {
-  label: string;
-  value: string;
-  isLink?: boolean;
-}
-
-const InfoRow: React.FC<InfoRowProps> = ({ label, value, isLink }) => {
-  const colors = useColors();
-
-  const handlePress = () => {
-    if (isLink) {
-      Linking.openURL(value.startsWith('http') ? value : `https://${value}`);
-    }
-  };
-
-  return (
-    <View style={styles.infoRow}>
-      <Text style={[styles.infoLabel, { color: colors.textTertiary }]}>{label}</Text>
-      {isLink ? (
-        <Pressable onPress={handlePress}>
-          <Text style={[styles.infoValue, { color: colors.info }]} numberOfLines={1}>
-            {value}
-          </Text>
-        </Pressable>
-      ) : (
-        <Text style={[styles.infoValue, { color: colors.textSecondary }]} numberOfLines={1}>
-          {value}
-        </Text>
-      )}
-    </View>
-  );
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -163,21 +131,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: spacing.lg,
     marginBottom: spacing.lg,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: spacing.sm,
-  },
-  infoLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  infoValue: {
-    fontSize: 14,
-    fontWeight: '500',
-    maxWidth: '60%',
   },
   openButton: {
     borderRadius: borderRadius.lg,
