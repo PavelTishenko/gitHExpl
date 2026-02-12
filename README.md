@@ -1,97 +1,153 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# gitHExpl
 
-# Getting Started
+A React Native mobile app for exploring and browsing GitHub repositories. Search repos by name, topic, or keyword, browse results with infinite scroll, and view detailed repository information -- all with a polished dark/light theme.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## Tech Stack & Reasoning
 
-## Step 1: Start Metro
+### Core
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+| Technology | Version | Why  
+| **React Native** | 0.81 | Cross-platform iOS & Android from a single codebase. Version 0.81 ships with the New Architecture (Fabric renderer + TurboModules) enabled by default, delivering faster rendering and lower bridge overhead. |
+| **TypeScript** | 5.8 | Strict type safety (`strict: true`) across the entire codebase. Catches a whole class of bugs at compile time and provides first-class autocompletion and refactoring support in the IDE. |
+| **React Navigation 7** | Native Stack | The standard navigation solution for React Native. The native-stack navigator uses platform-native screen transitions (UINavigationController on iOS, Fragment on Android) for true 60fps animations, unlike JS-driven alternatives. |
+| **TanStack React Query 5** | 5.x | Declarative server-state management that avoids reinventing data fetching. Provides built-in caching (5-minute stale time, 30-minute garbage collection), request deduplication, automatic retries, and first-class infinite scroll pagination via `useInfiniteQuery`. |
+| **Zustand 5** | 5.x | Minimal, hook-based client state management for theme mode and search query/history. Chosen over Redux for its zero-boilerplate API, tiny bundle size (~1KB), and no need for providers or context wrappers. |
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+### UI & Icons
 
-```sh
-# Using npm
-npm start
+| Technology                         | Why                                                                                                                                                                                                                                                      |
+| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **react-native-svg**               | Crisp, scalable vector icons that render pixel-perfectly across all screen densities and platforms. Replaces inconsistent text emojis with a unified Feather/Lucide-style icon system where every icon accepts `size`, `color`, and `strokeWidth` props. |
+| **react-native-safe-area-context** | Provides safe area insets for notches, status bars, and home indicators. Required by React Navigation and used directly in screens for proper layout.                                                                                                    |
+| **react-native-screens**           | Wraps navigation screens in native containers for better memory efficiency and transitions. Required by React Navigation's native stack.                                                                                                                 |
 
-# OR using Yarn
-yarn start
+### Developer Experience
+
+| Technology                              | Why                                                                                                                                                                                             |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Prettier 3**                          | Enforced, opinionated code formatting so style discussions never block PRs.                                                                                                                     |
+| **@ianvs/prettier-plugin-sort-imports** | Automatic import ordering: Node builtins, then `react`/`react-native`, then third-party, then `@/app`, `@/shared`, `@/features`, then relative imports -- each group separated by a blank line. |
+| **ESLint + eslint-config-prettier**     | Linting for code quality without conflicting with Prettier's formatting rules. Extends `@react-native` base config.                                                                             |
+| **babel-plugin-module-resolver**        | `@/*` path aliases (maps to `src/*`) to eliminate deep relative imports like `../../../shared/hooks/useColors`.                                                                                 |
+
+## Project Structure
+
+```
+src/
+├── app/                          # App-level setup
+│   ├── navigation/               # RootNavigator, route types
+│   └── providers/                # AppProviders (QueryClient, SafeArea, Navigation)
+│
+├── features/                     # Feature modules (self-contained)
+│   ├── search/                   # GitHub repo search
+│   │   ├── api/                  # searchRepos API call
+│   │   ├── components/           # SearchBar, RepoList, RepoCard, SettingsMenu
+│   │   ├── hooks/                # useSearchScreen, useSearchRepos, useSearchStore
+│   │   ├── screens/              # SearchScreen
+│   │   └── types.ts              # GitHubRepo, GitHubSearchResponse
+│   │
+│   └── repo-details/             # Repository detail view
+│       ├── components/           # RepoHeader, StatsRow, OwnerCard
+│       ├── hooks/                # useRepoDetailScreen
+│       ├── screens/              # RepoDetailScreen
+│       └── types.ts
+│
+└── shared/                       # Shared across features
+    ├── components/
+    │   ├── icons/                # SVG icon components (Star, Fork, Search, etc.)
+    │   └── ui/                   # Badge, Chip, Separator
+    ├── hooks/                    # useColors, useDebounce, useThemeStore
+    ├── services/                 # API client, React Query client config
+    ├── theme/                    # Colors (dark/light), spacing, typography
+    └── utils/                    # formatNumber, formatDate, truncateText
 ```
 
-## Step 2: Build and run your app
+Each **feature** is a self-contained module with its own API layer, components, hooks, screens, and types. Features import from `shared/` but never from each other's internals.
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## Architecture
 
-### Android
+### Screen hook pattern
 
-```sh
-# Using npm
-npm run android
+Business logic is separated from rendering. Every screen has a corresponding hook that owns all state, effects, and callbacks:
 
-# OR using Yarn
-yarn android
+```
+SearchScreen.tsx          -->  useSearchScreen.ts
+RepoDetailScreen.tsx      -->  useRepoDetailScreen.ts
 ```
 
-### iOS
+Screens are pure render functions that destructure the hook return value and pass props to child components. No `useState`, `useCallback`, `useMemo`, or `useEffect` lives in screen files.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+### Data flow
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+```
+GitHub REST API
+      |
+  apiFetch()             # Shared fetch wrapper with error handling
+      |
+  React Query            # Caching, pagination, retries, deduplication
+      |
+  Screen hooks           # Derive UI state (repos list, loading flags, callbacks)
+      |
+  Screen components      # Pure rendering
 ```
 
-Then, and every time you update your native dependencies, run:
+### Theming
 
-```sh
-bundle exec pod install
+Two complete color palettes (`darkColors`, `lightColors`) are defined in `shared/theme/colors.ts`. The active palette is controlled by a Zustand store (`useThemeStore`) and accessed via `useColors()`. All components use dynamic colors, so the entire app responds instantly to theme changes.
+
+### Icon system
+
+Custom SVG icons live in `shared/components/icons/` and are barrel-exported from an `index.ts`. Every icon follows a consistent API:
+
+```tsx
+<StarIcon size={20} color={colors.accent} filled />
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## Getting Started
 
-```sh
-# Using npm
-npm run ios
+### Prerequisites
 
-# OR using Yarn
-yarn ios
+- Node.js >= 18
+- pnpm
+- Xcode (for iOS)
+- Android Studio + Android SDK (for Android)
+- CocoaPods (`gem install cocoapods`)
+
+### Install
+
+```bash
+# Clone the repo
+git clone <repo-url>
+cd gitHExpl
+
+# Install dependencies
+pnpm install
+
+# Install iOS pods
+cd ios && pod install && cd ..
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+### Run
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```bash
+# Start Metro bundler
+pnpm start
 
-## Step 3: Modify your app
+# Run on iOS
+pnpm ios
 
-Now that you have successfully run the app, let's make changes!
+# Run on Android
+pnpm android
+```
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+## Scripts
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+| Command             | Description                                            |
+| ------------------- | ------------------------------------------------------ |
+| `pnpm start`        | Start the Metro bundler                                |
+| `pnpm ios`          | Build and run on iOS simulator                         |
+| `pnpm android`      | Build and run on Android emulator                      |
+| `pnpm lint`         | Run ESLint                                             |
+| `pnpm format`       | Format all files with Prettier                         |
+| `pnpm format:check` | Check formatting (CI-friendly, exits non-zero on diff) |
+| `pnpm test`         | Run Jest tests                                         |

@@ -1,5 +1,35 @@
+/** @type {import("prettier").Config} */
 module.exports = {
-  arrowParens: 'avoid',
+  printWidth: 100,
+  tabWidth: 2,
+  useTabs: false,
+  semi: true,
   singleQuote: true,
+  quoteProps: 'as-needed',
+  jsxSingleQuote: false,
   trailingComma: 'all',
+  bracketSpacing: true,
+  bracketSameLine: false,
+  arrowParens: 'always',
+  endOfLine: 'lf',
+
+  plugins: ['@ianvs/prettier-plugin-sort-imports'],
+
+  importOrder: [
+    '<BUILTIN_MODULES>',
+    '',
+    '^react$',
+    '^react-native$',
+    '',
+    '<THIRD_PARTY_MODULES>',
+    '',
+    '^@/app/(.*)$',
+    '^@/shared/(.*)$',
+    '^@/features/(.*)$',
+    '',
+    '^[.]',
+  ],
+  importOrderParserPlugins: ['typescript', 'jsx', 'decorators-legacy'],
+  importOrderTypeScriptVersion: '5.0.0',
+  importOrderCaseSensitive: false,
 };

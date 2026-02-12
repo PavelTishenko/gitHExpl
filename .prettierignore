@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Build output
+android/app/build/
+ios/build/
+ios/Pods/
+
+# Metro
+.metro-health-check*
+
+# Lockfiles
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+
+# Generated
+*.generated.*
+coverage/
