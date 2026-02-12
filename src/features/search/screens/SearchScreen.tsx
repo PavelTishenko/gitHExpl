@@ -4,6 +4,7 @@ import { Pressable, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { SettingsIcon } from '@/shared/components/icons';
+import { OfflineBanner } from '@/shared/components/ui/OfflineBanner';
 import { useColors } from '@/shared/hooks/useColors';
 import { useThemeStore } from '@/shared/hooks/useThemeStore';
 import { borderRadius, spacing } from '@/shared/theme/spacing';
@@ -63,6 +64,8 @@ export const SearchScreen: React.FC = () => {
           <SettingsIcon size={20} color={colors.textPrimary} />
         </Pressable>
       </View>
+
+      <OfflineBanner />
 
       <SearchBar value={query} onChangeText={setQuery} />
 
