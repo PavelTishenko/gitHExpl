@@ -16,7 +16,7 @@ interface AppProvidersProps {
   children: React.ReactNode;
 }
 
-const InnerProviders: React.FC = ({ children }) => {
+const InnerProviders = ({ children }: AppProvidersProps) => {
   const colors = useColors();
   const mode = useThemeStore((s) => s.mode);
 
@@ -40,7 +40,7 @@ const InnerProviders: React.FC = ({ children }) => {
   return <NavigationContainer theme={navigationTheme}>{children}</NavigationContainer>;
 };
 
-export const AppProviders: React.FC = ({ children }) => {
+export const AppProviders = ({ children }: AppProvidersProps) => {
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={{ persister: queryPersister }}>
       <SafeAreaProvider>
